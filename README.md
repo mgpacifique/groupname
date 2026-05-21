@@ -1,13 +1,14 @@
-# MoMo SMS Data Processing System
+groupname - MOMO SMS Data processing system. 
 
-An enterprise fullstack system built to ingest, normalize, categorize, and visualize mobile money transaction metrics extracted directly from raw mobile SMS XML backups.
+An enterprise grade fullstack system built to ingest, normalize, categorize, and visualize mobile money transaction metrics extracted directly from raw mobile SMS XML backups.
 
-## 👥 Team Setup
+##  Team Setup
 - **Team Name**: groupname
 - **Project Role Assignation**:
-  - Miracle Mmaduabuchi Chidozie: Backend Architect & Database Engineering
-  - Paci:
-  - r:
+  - Miracle Mmaduabuchi Chidozie: Team lead & Backend Architect 
+  - Paci: Database engineering & APIs
+  - Hedrick: Data processing, Documentation & Visualization.
+  - Fourth guy: Front end, ETL & testing. 
 
 ## Agile Management Controls
 - **Scrum Board Tracking Workspace**: [PASTE YOUR TRELLO, JIRA, OR GITHUB PROJECTS LINK HERE]
