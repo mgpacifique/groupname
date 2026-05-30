@@ -11,7 +11,7 @@ An enterprise grade fullstack system built to ingest, normalize, categorize, and
   - David: API, ETL & testing. 
 
 ## Agile Management Controls
-- **Scrum Board Tracking Workspace**: [PASTE YOUR TRELLO, JIRA, OR GITHUB PROJECTS LINK HERE]
+- **Scrum Board Tracking Workspace**: https://trello.com/b/jNaGcVft
 - **High-Level System Architecture Design Link**: [PASTE YOUR DRAW.IO OR MIRO LINK HERE]
 
 ## System Directory Roadmap
