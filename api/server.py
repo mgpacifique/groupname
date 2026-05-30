@@ -114,7 +114,7 @@ class MoMoAPIHandler(BaseHTTPRequestHandler):
                 
             TRANSACTIONS_DATA.append(post_data)
             TRANSACTIONS_DICT[tx_id] = post_data
-            return self.send_json({"status": "Created", "transaction": post_data}, 21)
+            return self.send_json({"status": "Created", "transaction": post_data}, 201)
 
         self.send_json({"error": "Bad Request", "message": "Invalid Endpoint"}, 400)
 
