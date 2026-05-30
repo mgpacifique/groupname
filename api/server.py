@@ -152,7 +152,7 @@ class MoMoAPIHandler(BaseHTTPRequestHandler):
 def run():
     server_address = ('', 8000)
     httpd = HTTPServer(server_address, MoMoAPIHandler)
-    print("🚀 MoMo Secure API Server running on port 8000...")
+    print(" MoMo Secure API Server running on port 8000...")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
