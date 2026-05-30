@@ -3,29 +3,47 @@ import json
 import base64
 import time
 
-# --- seeded data from sql shema ---
-TRANSACTIONS_DATA = [
-    {
-        "transaction_id": "76662021700",
-        "timestamp": "2024-05-10T16:30:51Z",
-        "financials": {"amount": 2000.00, "fee": 0.00, "currency": "RWF", "post_transaction_balance": 2000.00},
-        "category": {"category_id": 1, "name": "P2P Transfer", "description": "Money transferred between individual mobile wallets"},
-        "parties": {
-            "sender": {"user_id": 4, "full_name": "Jane Smith", "phone_number": "250788999999", "status": "Active"},
-            "receiver": {"user_id": 2, "full_name": "Samuel Carter", "phone_number": "250791666666", "status": "Active"}
+import sys
+import os
+import random
+
+# Add parent directory to path to import etl
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+try:
+    from etl.parse_xml import parse_momo_xml
+except ImportError:
+    def parse_momo_xml(path): return []
+
+# --- Load data from ETL or use seed ---
+xml_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'raw', 'modified_sms_v2.xml')
+parsed_data = parse_momo_xml(xml_path)
+
+if parsed_data:
+    TRANSACTIONS_DATA = parsed_data
+else:
+    print("WARNING: ETL parse_momo_xml returned empty. Using seeded test data.")
+    TRANSACTIONS_DATA = [
+        {
+            "transaction_id": "76662021700",
+            "timestamp": "2024-05-10T16:30:51Z",
+            "financials": {"amount": 2000.00, "fee": 0.00, "currency": "RWF", "post_transaction_balance": 2000.00},
+            "category": {"category_id": 1, "name": "P2P Transfer", "description": "Money transferred between individual mobile wallets"},
+            "parties": {
+                "sender": {"user_id": 4, "full_name": "Jane Smith", "phone_number": "250788999999", "status": "Active"},
+                "receiver": {"user_id": 2, "full_name": "Samuel Carter", "phone_number": "250791666666", "status": "Active"}
+            }
+        },
+        {
+            "transaction_id": "73214484437",
+            "timestamp": "2024-05-10T16:31:39Z",
+            "financials": {"amount": 1000.00, "fee": 0.00, "currency": "RWF", "post_transaction_balance": 1000.00},
+            "category": {"category_id": 2, "name": "Merchant Payment", "description": "Payments made to businesses directly"},
+            "parties": {
+                "sender": {"user_id": 2, "full_name": "Samuel Carter", "phone_number": "250791666666", "status": "Active"},
+                "receiver": {"user_id": 4, "full_name": "Jane Smith", "phone_number": "250788999999", "status": "Active"}
+            }
         }
-    },
-    {
-        "transaction_id": "73214484437",
-        "timestamp": "2024-05-10T16:31:39Z",
-        "financials": {"amount": 1000.00, "fee": 0.00, "currency": "RWF", "post_transaction_balance": 1000.00},
-        "category": {"category_id": 2, "name": "Merchant Payment", "description": "Payments made to businesses directly"},
-        "parties": {
-            "sender": {"user_id": 2, "full_name": "Samuel Carter", "phone_number": "250791666666", "status": "Active"},
-            "receiver": {"user_id": 4, "full_name": "Jane Smith", "phone_number": "250788999999", "status": "Active"}
-        }
-    }
-]
+    ]
 
 TRANSACTIONS_DICT = {t["transaction_id"]: t for t in TRANSACTIONS_DATA}
 
@@ -70,6 +88,44 @@ class MoMoAPIHandler(BaseHTTPRequestHandler):
         # Route: GET /transactions
         if self.path == '/transactions' or self.path == '/transactions/':
             return self.send_json(TRANSACTIONS_DATA)
+
+        # Route: GET /dsa/compare
+        # Evaluates Linear Search vs Dictionary Lookup for 20 records
+        if self.path == '/dsa/compare':
+            if len(TRANSACTIONS_DATA) < 20:
+                return self.send_json({"error": "Not enough data", "message": "Need at least 20 records to compare"}, 400)
+            
+            # Select 20 random IDs to search
+            sample_records = random.sample(TRANSACTIONS_DATA, 20)
+            target_ids = [r["transaction_id"] for r in sample_records]
+            
+            # 1. Linear Search
+            start_linear = time.perf_counter_ns()
+            linear_results = []
+            for tx_id in target_ids:
+                for tx in TRANSACTIONS_DATA:
+                    if tx["transaction_id"] == tx_id:
+                        linear_results.append(tx)
+                        break
+            end_linear = time.perf_counter_ns()
+            linear_time = end_linear - start_linear
+            
+            # 2. Dictionary Lookup
+            start_dict = time.perf_counter_ns()
+            dict_results = []
+            for tx_id in target_ids:
+                dict_results.append(TRANSACTIONS_DICT.get(tx_id))
+            end_dict = time.perf_counter_ns()
+            dict_time = end_dict - start_dict
+            
+            comparison = {
+                "records_tested": 20,
+                "linear_search_time_ns": linear_time,
+                "dictionary_lookup_time_ns": dict_time,
+                "winner": "Dictionary Lookup" if dict_time < linear_time else "Linear Search",
+                "difference_ns": abs(linear_time - dict_time)
+            }
+            return self.send_json(comparison)
 
         # Route: GET /transactions/{id}
         if self.path.startswith('/transactions/'):
