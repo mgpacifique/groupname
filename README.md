@@ -5,8 +5,8 @@ An enterprise grade fullstack system built to ingest, normalize, categorize, and
 ##  Team Setup
 - **Team Name**: groupname
 - **Project Role Assignation**:
-  - Miracle Mmaduabuchi Chidozie: Team lead & Backend Architect 
-  - Paci: Database engineering & Front end.
+  - Paci: Team lead & Backend Architect 
+  - Miracle: Database engineering & Front end.
   - Hedrick: Data processing, Documentation & Visualization.
   - David: API, ETL & testing. 
 
