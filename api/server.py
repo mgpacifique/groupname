@@ -98,3 +98,66 @@ class MoMoAPIHandler(BaseHTTPRequestHandler):
                 return self.send_json({"error": "Not Found", "message": f"Transaction {tx_id} not found"}, 404)
 
         self.send_json({"error": "Bad Request", "message": "Invalid Endpoint"}, 400)
+
+    def do_POST(self):
+        if not self.check_auth():
+            return self.send_unauthorized()
+
+        if self.path == '/transactions' or self.path == '/transactions/':
+            content_length = int(self.headers['Content-Length'])
+            post_data = json.loads(self.rfile.read(content_length).decode())
+            
+            # Add to memory structures
+            tx_id = post_data.get("transaction_id")
+            if not tx_id:
+                return self.send_json({"error": "Bad Request", "message": "Missing transaction_id"}, 400)
+                
+            TRANSACTIONS_DATA.append(post_data)
+            TRANSACTIONS_DICT[tx_id] = post_data
+            return self.send_json({"status": "Created", "transaction": post_data}, 21)
+
+        self.send_json({"error": "Bad Request", "message": "Invalid Endpoint"}, 400)
+
+    def do_PUT(self):
+        if not self.check_auth():
+            return self.send_unauthorized()
+
+        if self.path.startswith('/transactions/'):
+            tx_id = self.path.split('/')[-1]
+            if tx_id in TRANSACTIONS_DICT:
+                content_length = int(self.headers['Content-Length'])
+                put_data = json.loads(self.rfile.read(content_length).decode())
+                
+                # Update records
+                TRANSACTIONS_DICT[tx_id].update(put_data)
+                return self.send_json({"status": "Updated", "transaction": TRANSACTIONS_DICT[tx_id]})
+            else:
+                return self.send_json({"error": "Not Found", "message": "Transaction variant missing"}, 404)
+
+    def do_DELETE(self):
+        if not self.check_auth():
+            return self.send_unauthorized()
+
+        if self.path.startswith('/transactions/'):
+            tx_id = self.path.split('/')[-1]
+            if tx_id in TRANSACTIONS_DICT:
+                # Remove from both data structures
+                tx_to_remove = TRANSACTIONS_DICT[tx_id]
+                TRANSACTIONS_DATA.remove(tx_to_remove)
+                del TRANSACTIONS_DICT[tx_id]
+                return self.send_json({"status": "Deleted", "message": f"Transaction {tx_id} removed completely."})
+            else:
+                return self.send_json({"error": "Not Found", "message": "Transaction variant missing"}, 404)
+
+def run():
+    server_address = ('', 8000)
+    httpd = HTTPServer(server_address, MoMoAPIHandler)
+    print("🚀 MoMo Secure API Server running on port 8000...")
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\nShutting down server safely.")
+
+if __name__ == '__main__':
+    run()
+
