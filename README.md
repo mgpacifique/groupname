@@ -12,7 +12,7 @@ An enterprise grade fullstack system built to ingest, normalize, categorize, and
 
 ## Agile Management Controls
 - **Scrum Board Tracking Workspace**: https://trello.com/b/jNaGcVft/momo-sms-etl
-- **High-Level System Architecture Design Link**: [PASTE YOUR DRAW.IO OR MIRO LINK HERE]
+- **High-Level System Architecture Design Link**: https://drive.google.com/file/d/1MR7c1AUgzeddNcCrs4eOUZl5QO72C0DU/view?usp=sharing
 
 ## System Directory Roadmap
 
